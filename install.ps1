@@ -36,6 +36,7 @@ choco install git.install -y -params '"/GitAndUnixToolsOnPath /NoAutoCrlf"'
 
 # Help git tools find correct locations.
 Set-Var User HOME $root
+&"$env:LOCALAPPDATA\Programs\Git\cmd\git" config --global credential.helper wincred
 
 # Setup .NET.
 &{$Branch='dev';iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.ps1'))}
