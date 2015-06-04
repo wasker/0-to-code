@@ -10,7 +10,7 @@ Add-Path -scope Process -path "$chocolateyRoot\bin"
 choco feature enable --name=autoUninstaller
 
 # Setup ConEmu.
-choco install conemu -y
+choco install cmder -y
 
 # Install nodejs and configure NPM to use known locations.
 Write-Host "Installing nodejs..."
@@ -47,4 +47,4 @@ $vscodeRoot = "$env:LOCALAPPDATA\Code\bin"
 choco install visualstudiocode -y
 Add-Path -scope User -path "$vscodeRoot"
 
-Write-Host "All done! Please close this window and start ConEmu."
+Write-Host "All done! Please close this window and start Cmder."
