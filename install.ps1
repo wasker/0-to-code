@@ -6,6 +6,12 @@ Set-Var -scope Process -name ChocolateyInstall -value "$chocolateyRoot"
 (iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')))>$null 2>&1
 Add-Path -scope Process -path "$chocolateyRoot\bin"
 
+# Setup tools/bin root for portable packages.
+Set-Var -scope Process -name ChocolateyBinRoot -value "$chocolateyToolsRoot"
+Set-Var -scope User -name ChocolateyBinRoot -value "$chocolateyToolsRoot"
+Add-Path -scope Process -path "$chocolateyToolsRoot"
+Add-Path -scope User -path "$chocolateyToolsRoot"
+
 # Allow uninstallers to be executed.
 choco feature enable --name=autoUninstaller
 
