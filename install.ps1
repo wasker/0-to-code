@@ -1,6 +1,8 @@
 Import-Module .\settings.psm1
 Import-Module .\envy.psm1
 
+$is64bit = "$env:PROCESSOR_ARCHITECTURE" -like "AMD64"
+
 # Setup chocolatey in known location.
 Set-Var -scope Process -name ChocolateyInstall -value "$chocolateyRoot"
 (iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1')))>$null 2>&1
@@ -34,15 +36,23 @@ Add-Path -scope User -path "$npmRepository"
 npm install -g $defaultNpmModules
 
 # Install git.
-$gitRegistryKey = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1"
-if ((Test-Path $gitRegistryKey) -eq $false) {
-    New-Item -Path $gitRegistryKey
-}
-choco install git.install -y -params '"/GitAndUnixToolsOnPath /NoAutoCrlf"'
+Write-Host "Installing git..."
+$chocolateyRoot | .\Invoke-ElevatedCommand.ps1 { &"$input\bin\choco" install git.install -y -params '"/GitAndUnixToolsOnPath /NoAutoCrlf"' }
 
 # Help git tools find correct locations.
 Set-Var User HOME $root
-&"$env:LOCALAPPDATA\Programs\Git\cmd\git" config --global credential.helper wincred
+
+# Setup wincred for git.
+$gitRegistryKey = "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1"
+if ($is64bit -eq $false) {
+  $gitRegistryKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1"
+}
+$gitKeys = Get-ItemProperty -Path $gitRegistryKey
+$gitLocation = $gitKeys.InstallLocation
+if ($gitLocation -ne "") {
+  $gitPath = Join-Path $gitLocation "cmd"
+  &"$gitPath\git" config --global credential.helper wincred
+}
 
 # Setup .NET.
 &{$Branch='dev';iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.ps1'))}

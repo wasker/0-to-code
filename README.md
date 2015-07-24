@@ -27,8 +27,11 @@ This set of scripts will help you to get all tools that you need to be productiv
 Download this repository's contents as ZIP, unzip it and run this from the command line:
 
 ```
+powershell -Command "& { dir *.ps1 | Unblock-File }"
 powershell -File .\install.ps1
 ```
+
+First line will remove blocking from scripts downloaded from Internet. Second line will actually install the software.
 
 If PowerShell complains on disabled scripts, run the command shown below and then repeat the previous command:
 
