@@ -18,7 +18,26 @@ Add-Path -scope User -path "$chocolateyToolsRoot"
 choco feature enable --name=autoUninstaller
 
 # Setup ConEmu.
-choco install conemu -y
+Write-Host "Installing ConEmu..."
+$chocolateyRoot | .\Invoke-ElevatedCommand.ps1 { &"$input\bin\choco" install conemu -y }
+
+# Install git.
+Write-Host "Installing git..."
+$chocolateyRoot | .\Invoke-ElevatedCommand.ps1 { &"$input\bin\choco" install git.install -y -params '"/GitAndUnixToolsOnPath /NoAutoCrlf"' }
+
+# Help git tools find correct locations.
+Set-Var User HOME $root
+
+# Setup wincred for git.
+$gitRegistryKey = "HKLM:\SOFTWARE\GitForWindows"
+$gitKeys = Get-ItemProperty -Path $gitRegistryKey
+$gitLocation = $gitKeys.InstallPath
+if ($gitLocation -ne "") {
+  $gitPath = Join-Path $gitLocation "cmd"
+  Add-Path -scope Process -path "$gitPath"
+
+  git config --global credential.helper wincred
+}
 
 # Install nodejs and configure NPM to use known locations.
 Write-Host "Installing nodejs..."
@@ -34,25 +53,6 @@ Add-Path -scope User -path "$npmRepository"
 
 # Install default set of NPM modules.
 npm install -g $defaultNpmModules
-
-# Install git.
-Write-Host "Installing git..."
-$chocolateyRoot | .\Invoke-ElevatedCommand.ps1 { &"$input\bin\choco" install git.install -y -params '"/GitAndUnixToolsOnPath /NoAutoCrlf"' }
-
-# Help git tools find correct locations.
-Set-Var User HOME $root
-
-# Setup wincred for git.
-$gitRegistryKey = "HKLM:\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1"
-if ($is64bit -eq $false) {
-  $gitRegistryKey = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Git_is1"
-}
-$gitKeys = Get-ItemProperty -Path $gitRegistryKey
-$gitLocation = $gitKeys.InstallLocation
-if ($gitLocation -ne "") {
-  $gitPath = Join-Path $gitLocation "cmd"
-  &"$gitPath\git" config --global credential.helper wincred
-}
 
 # Setup .NET.
 &{$Branch='dev';iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/aspnet/Home/dev/dnvminstall.ps1'))}
