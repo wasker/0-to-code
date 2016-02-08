@@ -28,16 +28,18 @@ $chocolateyRoot | .\Invoke-ElevatedCommand.ps1 { &"$input\bin\choco" install git
 # Help git tools find correct locations.
 Set-Var User HOME $root
 
-# Setup wincred for git.
 $gitRegistryKey = "HKLM:\SOFTWARE\GitForWindows"
 $gitKeys = Get-ItemProperty -Path $gitRegistryKey
 $gitLocation = $gitKeys.InstallPath
 if ($gitLocation -ne "") {
   $gitPath = Join-Path $gitLocation "cmd"
   Add-Path -scope Process -path "$gitPath"
-
-  git config --global credential.helper wincred
 }
+
+# Install git credentials manager.
+Write-Host "Installing git credentials manager..."
+$chocolateyRoot | .\Invoke-ElevatedCommand.ps1 { &"$input\bin\choco" install git-credential-manager-for-windows -y }
+git config --global credential.helper manager
 
 # Install nodejs and configure NPM to use known locations.
 Write-Host "Installing nodejs..."

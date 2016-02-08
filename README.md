@@ -27,7 +27,7 @@ This set of scripts will help you to get all tools that you need to be productiv
 Download this repository's contents as ZIP, unzip it and run this from the command line:
 
 ```
-powershell -Command "& { dir *.ps1 | Unblock-File }"
+powershell -Command "& { dir *.ps*1 | Unblock-File }"
 powershell -File .\install.ps1
 ```
 
@@ -46,7 +46,3 @@ By default the installation will use your user profile folder as a "root". If yo
 After installation completed, please close the command prompt window and open another one, or better yet, start ConEmu. This is required, because changes in the environment variables will not be picked up otherwise. You should expect commands like "choco", "bower", "yo", "npm", "git" and "code" to be available in the new console session.
 
 Start coding!
-
-## Disclaimer
-
-This toolset was verified on Windows 8.1 machines that have .NET 4.5.1 installed. Apparently, .NET 4.5.1 is a dependency of Visual Studio Code package. I'm not sure whether Chocolatey will elevate properly during .NET 4.5.1 installation, if it needs to install it, so Visual Studio Code installation might fail on systems w/o .NET 4.5.1. If this happens, please install .NET 4.5.1 and run "choco install visualstudiocode -y" to finish Visual Studio Code installation. This is the last step of the install script, so other parts will be installed properly beforehand.
